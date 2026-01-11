@@ -1,0 +1,20 @@
+{
+  "name": "are-you-the-one",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "build": "bun build ./index.ts --sourcemap=linked --public-path=./ --outdir ./dist --target browser --minify",
+    "build:watch": "bun build ./index.ts --sourcemap=linked --public-path=./ --outdir ./dist --target browser --minify --watch",
+    "build:blog": "bun build ./index.ts --sourcemap=linked --public-path=./ --outdir ../../static/js/are-you-the-one-is-free-money --target browser --minify && cp ../styles/are-you-the-one-is-free-money/question-analysis.css ../../static/css/question-analysis.css"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "canvas-confetti": "^1.9.3",
+    "lit": "^3.3.0"
+  }
+}

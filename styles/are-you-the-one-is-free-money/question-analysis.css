@@ -1,0 +1,215 @@
+o-node inline support
+o-node {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.probabilities-table {
+  margin-top: 16px;
+  border-collapse: collapse;
+  width: 100%;
+  font-family: monospace;
+  font-size: 12px;
+  display: table;
+}
+
+.probabilities-table th,
+.probabilities-table td {
+  border: 1px solid var(--border);
+  padding: 4px;
+  text-align: center;
+  color: var(--primary);
+}
+
+.probabilities-table th {
+  background-color: var(--entry);
+  font-weight: bold;
+}
+
+/* Question Comparison - Compact Pill Design */
+.question-comparison {
+  margin: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.question-row {
+  display: grid;
+  grid-template-columns: 200px 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--entry);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.question-row.winner {
+  border: 2px solid var(--green);
+}
+
+.question-label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--primary);
+  white-space: nowrap;
+}
+
+.outcome-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--theme);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.pill-outcome {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.pill-prob {
+  color: var(--secondary);
+  font-weight: 500;
+}
+
+.pill-info {
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.pill-expected {
+  color: var(--secondary);
+  font-style: italic;
+  font-size: 0.8rem;
+}
+
+.total-expected {
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  text-align: center;
+  white-space: nowrap;
+  min-width: 90px;
+}
+
+.total-expected.high {
+  background: var(--green);
+  color: white;
+}
+
+.total-expected.moderate {
+  background: var(--tertiary);
+  color: var(--primary);
+}
+
+.total-expected.low {
+  background: var(--tertiary);
+  color: var(--primary);
+}
+
+/* Performance Stats Pills */
+.performance-stats {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem 0;
+}
+
+.stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: var(--entry);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  transition: all 0.2s ease;
+}
+
+.stat-title {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1rem;
+  padding-right: 0.25rem;
+}
+
+.stat-label {
+  color: var(--secondary);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.stat-value {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.stat-value-red {
+  color: var(--red);
+}
+
+.stat-value-green {
+  color: var(--green);
+}
+
+.stat-value-blue {
+  color: var(--blue);
+}
+
+.stat-separator {
+  color: var(--tertiary);
+  font-weight: 400;
+  font-size: 0.9rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .question-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  
+  .question-label {
+    white-space: normal;
+  }
+  
+  .outcome-pills {
+    flex-direction: column;
+  }
+  
+  .pill {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .total-expected {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .pill {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  
+  .pill-outcome,
+  .pill-prob,
+  .pill-info,
+  .pill-expected {
+    flex: 1 1 auto;
+  }
+}
