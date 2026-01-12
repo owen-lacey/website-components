@@ -15,12 +15,24 @@ const meta: Meta = {
     size: {
       control: { type: 'number', min: 20, max: 100, step: 5 },
       description: 'Size of the node in pixels'
+    },
+    color: {
+      control: { type: 'select' },
+      options: ['var(--red)', 'var(--blue)', 'var(--green)', 'var(--yellow)', 'var(--purple)'],
+      description: 'Color of the node using CSS variables'
     }
   },
   args: {
     gender: 'male',
-    size: 40
-  }
+    size: 40,
+  },
+  render: (args) => html`
+    <o-node
+      .gender=${args.gender}
+      .size=${args.size}
+      style="--node-color: ${args.color}"
+    ></o-node>
+  `
 };
 
 export default meta;
@@ -31,10 +43,12 @@ export const MaleNode: Story = {
     <o-node
       .gender=${'male'}
       .size=${args.size}
+      style="--node-color: ${args.color}"
     ></o-node>
   `,
   args: {
-    size: 40
+    size: 40,
+    color: "var(--green)"
   },
   parameters: {
     docs: {
@@ -50,10 +64,11 @@ export const FemaleNode: Story = {
     <o-node
       .gender=${'female'}
       .size=${args.size}
+      style="--node-color: ${args.color}"
     ></o-node>
   `,
   args: {
-    size: 40
+    size: 40,
   },
   parameters: {
     docs: {
@@ -65,14 +80,20 @@ export const FemaleNode: Story = {
 };
 
 export const CustomSize: Story = {
-  render: () => html`
+  args: {
+    color: "var(--green)",
+    gender: "female"
+  },
+
+  render: (args) => html`
     <div style="display: flex; gap: 20px; align-items: center;">
-      <o-node .gender=${'male'} .size=${20}></o-node>
-      <o-node .gender=${'male'} .size=${40}></o-node>
-      <o-node .gender=${'male'} .size=${60}></o-node>
-      <o-node .gender=${'male'} .size=${80}></o-node>
+      <o-node .gender=${'male'} .size=${20} style="--node-color: ${args.color}"></o-node>
+      <o-node .gender=${'male'} .size=${40} style="--node-color: ${args.color}"></o-node>
+      <o-node .gender=${'male'} .size=${60} style="--node-color: ${args.color}"></o-node>
+      <o-node .gender=${'male'} .size=${80} style="--node-color: ${args.color}"></o-node>
     </div>
   `,
+
   parameters: {
     docs: {
       description: {
@@ -85,7 +106,8 @@ export const CustomSize: Story = {
 export const MiniNode: Story = {
   args: {
     gender: 'male',
-    size: 20
+    size: 20,
+    color: "var(--blue)"
   },
   parameters: {
     docs: {
@@ -102,27 +124,18 @@ export const WithCustomColor: Story = {
       <o-node
         .gender=${'male'}
         .size=${args.size}
-        style="--node-color: var(--red)"
+        style="--node-color: ${args.color}"
       ></o-node>
       <o-node
         .gender=${'female'}
         .size=${args.size}
-        style="--node-color: var(--blue)"
-      ></o-node>
-      <o-node
-        .gender=${'male'}
-        .size=${args.size}
-        style="--node-color: var(--green)"
-      ></o-node>
-      <o-node
-        .gender=${'female'}
-        .size=${args.size}
-        style="--node-color: var(--purple)"
+        style="--node-color: ${args.color}"
       ></o-node>
     </div>
   `,
   args: {
-    size: 40
+    size: 40,
+    color: "var(--blue)"
   },
   parameters: {
     docs: {

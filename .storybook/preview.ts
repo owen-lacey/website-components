@@ -1,5 +1,5 @@
 import type { Preview } from '@storybook/web-components';
-import '../styles/global.css';
+import './theme.css';
 
 const preview: Preview = {
   parameters: {
@@ -17,6 +17,12 @@ const preview: Preview = {
       ]
     }
   },
+  decorators: [
+    (story) => {
+      document.documentElement.classList.add('dark');
+      return story();
+    }
+  ]
 };
 
 export default preview;

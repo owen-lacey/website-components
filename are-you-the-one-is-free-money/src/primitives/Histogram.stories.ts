@@ -48,7 +48,8 @@ export const Empty: Story = {
   args: {
     scores: [],
     barCount: 7,
-    showGhostBars: false
+    showGhostBars: false,
+    selectedScore: 2
   }
 };
 

@@ -13,8 +13,9 @@ const meta: Meta = {
       description: 'Shape of the character icon'
     },
     color: {
-      control: 'text',
-      description: 'Color of the shape (use CSS color values or CSS variables like var(--red))'
+      control: { type: 'select' },
+      options: ['var(--red)', 'var(--blue)', 'var(--green)', 'var(--yellow)', 'var(--purple)'],
+      description: 'Color of the shape'
     },
     isOpaque: {
       control: 'boolean',
@@ -199,7 +200,9 @@ export const OpaqueVsOutlined: Story = {
 export const FlippedCard: Story = {
   args: {
     flipped: true,
-    width: 80
+    width: 80,
+    isOpaque: false,
+    color: "var(--green)"
   },
   parameters: {
     docs: {
