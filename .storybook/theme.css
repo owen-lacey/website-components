@@ -11,6 +11,7 @@
   --content: rgb(196, 196, 197);
   --code-bg: rgb(55, 56, 62);
   --border: rgb(51, 51, 51);
+  --radius: 8px;
 
   /* Soft color palette for dark theme */
   --red: #ff6b6b;

@@ -27,7 +27,7 @@ export class FactShuffler extends LitElement {
     "I'm an expert bird caller"
   ];
 
-  scrollFactsCount = 1000;
+  scrollFactsCount = 30;
 
   transitionDuration = 1000;
 
@@ -46,64 +46,112 @@ export class FactShuffler extends LitElement {
     }
 
     .fact {
+      --ink: rgb(var(--color, 0, 0, 0));
       margin: 0 2rem;
       display: flex;
-      border-radius: 5px;
-      border: 3px dashed rgba(var(--color, 0, 0, 0), 0.2);
-      font-size: 1rem;
-      max-width: 90%;
-      color: rgb(var(--color, 0, 0, 0));
+      border-radius: var(--radius, 8px);
+      border: 1px solid rgba(var(--color, 0, 0, 0), 0.08);
+      font-size: 1.05rem;
+      max-width: 92%;
+      color: var(--ink);
+      background: linear-gradient(135deg, rgba(var(--color, 0, 0, 0), 0.05), rgba(var(--color, 0, 0, 0), 0.015));
+      box-shadow: 0 12px 30px rgba(var(--color, 0, 0, 0), 0.08), inset 0 1px 0 rgba(var(--color, 0, 0, 0), 0.06);
+      position: relative;
+      overflow: hidden;
     }
 
     .facts-scroller {
-      height: 3.5rem;
+      height: 3.75rem;
       flex: 1;
       overflow: hidden;
-      padding: 0.25em 0.5em;
+      padding: 0.25em 0.75em;
+      position: relative;
     }
 
     .facts-scroller > div {
       top: 0;
       position: relative;
+      transform: translateY(0);
+      will-change: transform;
     }
 
     .facts-scroller > div > div {
       word-wrap: break-word;
-      height: 3.5rem;
+      height: 3.75rem;
       display: flex;
       align-items: center;
       justify-content: center;
+      letter-spacing: 0.01em;
+      font-weight: 500;
+      transition: opacity 220ms ease;
     }
 
     .facts-scroller > div.scrolling {
-      transition: top var(--transition-duration) cubic-bezier(0, 0, 0, 1);
-      top: calc(3.5rem * -1 * var(--facts-count));
+      animation: fact-scroll var(--transition-duration) cubic-bezier(0.16, 0.9, 0.2, 1) both;
+    }
+
+    .fact::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 0%, rgba(var(--color, 0, 0, 0), 0.08), transparent 55%);
+      pointer-events: none;
     }
 
     .shuffle-fact {
-      flex: 0 1 3.5rem;
-      border-left: 3px dashed rgba(var(--color, 0, 0, 0), 0.2);
+      flex: 0 0 3.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
     }
 
     button {
-      padding: 10px;
-      width: 100%;
-      height: 100%;
-      background: none;
+      width: 2.6rem;
+      height: 2.6rem;
+      border-radius: 999px;
+      background: rgba(var(--color, 0, 0, 0), 0.1);
       display: flex;
       align-items: center;
+      justify-content: center;
       border: none;
       cursor: pointer;
-      color: inherit;
+      color: var(--ink);
+      transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+      box-shadow: 0 6px 14px rgba(var(--color, 0, 0, 0), 0.15);
     }
 
     button:disabled {
       cursor: progress;
+      opacity: 0.6;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px) rotate(-6deg);
+      background: rgba(var(--color, 0, 0, 0), 0.16);
+      box-shadow: 0 10px 20px rgba(var(--color, 0, 0, 0), 0.18);
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(0) rotate(0);
+      box-shadow: 0 6px 14px rgba(var(--color, 0, 0, 0), 0.15);
     }
 
     svg {
-      width: 100%;
-      height: 100%;
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    @keyframes fact-scroll {
+      0% {
+        transform: translateY(0);
+      }
+      82% {
+        transform: translateY(calc(3.75rem * -1 * var(--facts-count) - 6px));
+      }
+      100% {
+        transform: translateY(calc(3.75rem * -1 * var(--facts-count)));
+      }
     }
   `;
 
