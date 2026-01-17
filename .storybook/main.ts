@@ -2,8 +2,7 @@ import type { StorybookConfig } from '@storybook/web-components-vite';
 
 const config: StorybookConfig = {
   stories: [
-    '../are-you-the-one-is-free-money/src/**/*.stories.@(js|jsx|ts|tsx)',
-    '../**/stories/**/*.mdx'
+    '../**/src/**/*.stories.@(js|jsx|ts|tsx)',
   ],
   addons: [],
   framework: {
