@@ -1,5 +1,5 @@
 import type { Preview } from '@storybook/web-components';
-import './theme.css';
+import '../styles.css';
 
 const preview: Preview = {
   parameters: {
@@ -13,7 +13,7 @@ const preview: Preview = {
       default: 'dark',
       values: [
         { name: 'dark', value: '#1d1e20' },
-        { name: 'light', value: '#ffffff' }
+        { name: 'light', value: 'rgb(29, 30, 32)' }
       ]
     }
   },

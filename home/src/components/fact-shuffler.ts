@@ -14,30 +14,41 @@ export class FactShuffler extends LitElement {
     scrollFacts: { state: true }
   };
 
-  facts: string[] = [
-    "I'm a full stack developer.",
-    "I'm a husband & dad.",
-    "I think maths is cool.",
-    "I have a bernese mountain dog called Toby.",
-    "I play trombone in a brass band.",
-    "I support LFC (for my sins).",
-    "I love escaping from escape rooms.",
-    "I have 3 older brothers",
-    "I can (slowly) solve a Rubik's cube",
-    "I'm an expert bird caller"
-  ];
+  declare facts: string[];
 
-  scrollFactsCount = 30;
+  declare scrollFactsCount: number;
 
-  transitionDuration = 1000;
+  declare transitionDuration: number;
 
-  private scrolling = false;
+  declare private scrolling: boolean;
 
-  private factToShow = 0;
+  declare private factToShow: number;
 
-  private nextFactToShow = 1;
+  declare private nextFactToShow: number;
 
-  private scrollFacts: number[] = this.createScrollFacts();
+  declare private scrollFacts: number[];
+
+  constructor() {
+    super();
+    this.facts = [
+      "I'm a software engineer.",
+      "I'm a husband & dad.",
+      "I think maths is cool.",
+      "I have a bernese mountain dog called Toby.",
+      "I play trombone in a brass band.",
+      "I support LFC (for my sins).",
+      "I love escaping from escape rooms.",
+      "I have 3 older brothers",
+      "I can (slowly) solve a Rubik's cube",
+      "I'm an expert bird caller"
+    ];
+    this.scrollFactsCount = 30;
+    this.transitionDuration = 1000;
+    this.scrolling = false;
+    this.factToShow = 0;
+    this.nextFactToShow = 1;
+    this.scrollFacts = this.createScrollFacts();
+  }
 
   static override styles = css`
     :host {
@@ -46,16 +57,13 @@ export class FactShuffler extends LitElement {
     }
 
     .fact {
-      --ink: rgb(var(--color, 0, 0, 0));
-      margin: 0 2rem;
+      max-width: 480px;
+      margin: 0 auto;
       display: flex;
       border-radius: var(--radius, 8px);
       border: 1px solid rgba(var(--color, 0, 0, 0), 0.08);
       font-size: 1.05rem;
-      max-width: 92%;
-      color: var(--ink);
-      background: linear-gradient(135deg, rgba(var(--color, 0, 0, 0), 0.05), rgba(var(--color, 0, 0, 0), 0.015));
-      box-shadow: 0 12px 30px rgba(var(--color, 0, 0, 0), 0.08), inset 0 1px 0 rgba(var(--color, 0, 0, 0), 0.06);
+      box-shadow: 0 6px 15px rgba(var(--color, 0, 0, 0), 0.08), inset 0 1px 0 rgba(var(--color, 0, 0, 0), 0.06);
       position: relative;
       overflow: hidden;
     }
@@ -94,7 +102,7 @@ export class FactShuffler extends LitElement {
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 20% 0%, rgba(var(--color, 0, 0, 0), 0.08), transparent 55%);
+      background: radial-gradient(circle at 20% 0%, rgba(var(--color), 0.03), transparent 55%);
       pointer-events: none;
     }
 
@@ -116,7 +124,6 @@ export class FactShuffler extends LitElement {
       justify-content: center;
       border: none;
       cursor: pointer;
-      color: var(--ink);
       transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
       box-shadow: 0 6px 14px rgba(var(--color, 0, 0, 0), 0.15);
     }
@@ -146,7 +153,7 @@ export class FactShuffler extends LitElement {
       0% {
         transform: translateY(0);
       }
-      82% {
+      70% {
         transform: translateY(calc(3.75rem * -1 * var(--facts-count) - 6px));
       }
       100% {
@@ -206,7 +213,7 @@ export class FactShuffler extends LitElement {
         <div class="shuffle-fact">
           <button @click=${this.shuffleFact} ?disabled=${this.scrolling} aria-label="Shuffle fact">
             <svg
-              fill="currentColor"
+              fill="var(--primary)"
               version="1.1"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 230.055 230.055"

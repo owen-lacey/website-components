@@ -4,7 +4,7 @@
   "main": "index.ts",
   "scripts": {
     "build": "bun build ./index.ts --sourcemap=linked --public-path=./ --outdir ./dist --target browser --minify",
-    "build:watch": "bun build ./index.ts --sourcemap=linked --public-path=./ --outdir ./dist --target browser --minify --watch",
+    "serve": "bun build ./index.ts --sourcemap=linked --public-path=./ --outdir ../../static/js/home --target browser --minify --watch",
     "build:blog": "bun build ./index.ts --sourcemap=linked --public-path=./ --outdir ../../static/js/home --target browser --minify"
   },
   "author": "",
