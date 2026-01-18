@@ -63,6 +63,7 @@ export class FactShuffler extends LitElement {
       border-radius: var(--radius, 8px);
       border: 1px solid rgba(var(--color, 0, 0, 0), 0.08);
       font-size: 1.05rem;
+      background: rgba(var(--theme));
       box-shadow: 0 6px 15px rgba(var(--color, 0, 0, 0), 0.08), inset 0 1px 0 rgba(var(--color, 0, 0, 0), 0.06);
       position: relative;
       overflow: hidden;
