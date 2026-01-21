@@ -12,10 +12,7 @@ const meta: Meta = {
     maxSize: { control: "number" },
     speed: { control: "number" },
     opacity: { control: "number" },
-    shape: {
-      control: { type: "select" },
-      options: ["triangle", "cube", "both"]
-    }
+    shape: { control: "inline-radio", options: ["triangles", "cubes", "both"] }
   },
   args: {
     count: 36,
@@ -23,7 +20,7 @@ const meta: Meta = {
     maxSize: 56,
     speed: 1,
     opacity: 0.45,
-    shape: "triangle"
+    shape: "triangles"
   },
   render: (args) => html`
     <div
