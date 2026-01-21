@@ -11,14 +11,16 @@ const meta: Meta = {
     minSize: { control: "number" },
     maxSize: { control: "number" },
     speed: { control: "number" },
-    opacity: { control: "number" }
+    opacity: { control: "number" },
+    shape: { control: "inline-radio", options: ["triangles", "cubes", "both"] }
   },
   args: {
     count: 36,
     minSize: 24,
     maxSize: 56,
     speed: 1,
-    opacity: 0.45
+    opacity: 0.45,
+    shape: "triangles"
   },
   render: (args) => html`
     <div
@@ -31,6 +33,7 @@ const meta: Meta = {
         .maxSize=${args.maxSize}
         .speed=${args.speed}
         .opacity=${args.opacity}
+        .shape=${args.shape}
       ></o-home-floaters>
     </div>
   `

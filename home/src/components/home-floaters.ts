@@ -13,6 +13,7 @@ interface FloaterConfig {
   delay: number;
   rotation: number;
   opacity: number;
+  shape: "triangles" | "cubes";
 }
 
 @customElement("o-home-floaters")
@@ -32,10 +33,18 @@ export class HomeFloaters extends LitElement {
   @property({ type: Number })
   opacity = 0.45;
 
+  @property({ type: String })
+  shape: "triangles" | "cubes" | "both" = "triangles";
+
   @state()
   private floaters: FloaterConfig[] = [];
 
   private prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  private handleTripleClick = (event: MouseEvent) => {
+    if (event.detail === 3) {
+      this.cycleShape();
+    }
+  };
 
   constructor() {
     super();
@@ -115,6 +124,12 @@ export class HomeFloaters extends LitElement {
   public connectedCallback(): void {
     super.connectedCallback();
     this.generateFloaters();
+    window.addEventListener("click", this.handleTripleClick);
+  }
+
+  public disconnectedCallback(): void {
+    window.removeEventListener("click", this.handleTripleClick);
+    super.disconnectedCallback();
   }
 
   protected willUpdate(changedProperties: Map<string, unknown>): void {
@@ -123,10 +138,15 @@ export class HomeFloaters extends LitElement {
       changedProperties.has("minSize") ||
       changedProperties.has("maxSize") ||
       changedProperties.has("speed") ||
-      changedProperties.has("opacity")
+      changedProperties.has("opacity") ||
+      changedProperties.has("shape")
     ) {
       this.generateFloaters();
     }
+  }
+
+  private cycleShape(): void {
+    this.shape = this.shape === "triangles" ? "cubes" : this.shape === "cubes" ? "both" : "triangles";
   }
 
   private generateFloaters(): void {
@@ -146,6 +166,7 @@ export class HomeFloaters extends LitElement {
       const spinDuration = (22 + Math.random() * 26) / speed;
       const delay = this.prefersReducedMotion ? 0 : -1 * Math.random() * floatDuration;
       const rotation = Math.floor(Math.random() * 360);
+      const shape = this.shape === "both" ? (Math.random() > 0.5 ? "triangles" : "cubes") : this.shape;
 
       return {
         size,
@@ -157,7 +178,8 @@ export class HomeFloaters extends LitElement {
         spinDuration,
         delay,
         rotation,
-        opacity
+        opacity,
+        shape
       };
     });
   }
@@ -184,6 +206,18 @@ export class HomeFloaters extends LitElement {
     `;
   }
 
+  private renderCube() {
+    return html`
+      <svg viewBox="0 0 279.8076211353316 320" role="presentation" aria-hidden="true">
+        <path
+          d="M 139.90 310.00 L 269.81 235.00 L 165.88 175.00 L 165.88 205.00 L 217.85 235.00 L 139.90 280.00 L 61.96 235.00 L 113.92 205.00 L 113.92 175.00 L 10.00 235.00 L 139.90 310.00 M 139.90 280.00 L 217.85 235.00 L 191.87 220.00 L 165.88 235.00 L 165.88 175.00 L 217.85 145.00 L 217.85 175.00 L 243.83 190.00 L 243.83 100.00 L 139.90 160.00 L 139.90 280.00 M 139.90 280.00 L 61.96 235.00 L 87.94 220.00 L 113.92 235.00 L 113.92 175.00 L 61.96 145.00 L 61.96 175.00 L 35.98 190.00 L 35.98 100.00 L 139.90 160.00 L 139.90 280.00 M 139.90 160.00 L 243.83 100.00 L 165.88 55.00 L 165.88 85.00 L 191.87 100.00 L 139.90 130.00 L 87.94 100.00 L 113.92 85.00 L 113.92 55.00 L 35.98 100.00 M 113.92 175.00 L 10.00 235.00 L 10.00 85.00 L 139.90 10.00 L 139.90 130.00 L 113.92 115.00 L 113.92 55.00 L 35.98 100.00 L 35.98 190.00 L 87.94 160.00 M 165.88 175.00 L 269.81 235.00 L 269.81 85.00 L 139.90 10.00 L 139.90 130.00 L 165.88 115.00 L 165.88 55.00 L 243.83 100.00 L 243.83 190.00 L 191.87 160.00"
+          stroke-width="4"
+          fill="none"
+        ></path>
+      </svg>
+    `;
+  }
+
   render() {
     return html`
       ${this.floaters.map((floater) => {
@@ -200,7 +234,9 @@ export class HomeFloaters extends LitElement {
           "--opacity": `${floater.opacity}`
         };
 
-        return html`<div class="floater" style=${styleMap(styles)}>${this.renderPenrose()}</div>`;
+        return html`<div class="floater" style=${styleMap(styles)}>
+          ${floater.shape === "cubes" ? this.renderCube() : this.renderPenrose()}
+        </div>`;
       })}
     `;
   }
