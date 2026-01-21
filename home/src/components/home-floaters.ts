@@ -40,11 +40,46 @@ export class HomeFloaters extends LitElement {
   private floaters: FloaterConfig[] = [];
 
   private prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  private handleTripleClick = (event: MouseEvent) => {
-    if (event.detail === 3) {
-      this.cycleShape();
+  private konamiSequence = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft"];
+  private konamiIndex = 0;
+  private lastKonamiAt = 0;
+  private handleEasterEggHotkey = (event: KeyboardEvent) => {
+    if (!event.altKey || !event.shiftKey || event.key.toLowerCase() !== "k") {
+      this.handleKonamiSequence(event);
+      return;
     }
+
+    const target = event.target as HTMLElement | null;
+    if (target?.isContentEditable || target?.tagName === "INPUT" || target?.tagName === "TEXTAREA") {
+      return;
+    }
+
+    this.cycleShape();
   };
+
+  private handleKonamiSequence(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (target?.isContentEditable || target?.tagName === "INPUT" || target?.tagName === "TEXTAREA") {
+      return;
+    }
+
+    const now = performance.now();
+    if (now - this.lastKonamiAt > 1200) {
+      this.konamiIndex = 0;
+    }
+    this.lastKonamiAt = now;
+
+    if (event.key === this.konamiSequence[this.konamiIndex]) {
+      this.konamiIndex += 1;
+      if (this.konamiIndex >= this.konamiSequence.length) {
+        this.konamiIndex = 0;
+        this.cycleShape();
+      }
+      return;
+    }
+
+    this.konamiIndex = event.key === this.konamiSequence[0] ? 1 : 0;
+  }
 
   constructor() {
     super();
@@ -124,11 +159,11 @@ export class HomeFloaters extends LitElement {
   public connectedCallback(): void {
     super.connectedCallback();
     this.generateFloaters();
-    window.addEventListener("click", this.handleTripleClick);
+    window.addEventListener("keydown", this.handleEasterEggHotkey);
   }
 
   public disconnectedCallback(): void {
-    window.removeEventListener("click", this.handleTripleClick);
+    window.removeEventListener("keydown", this.handleEasterEggHotkey);
     super.disconnectedCallback();
   }
 
