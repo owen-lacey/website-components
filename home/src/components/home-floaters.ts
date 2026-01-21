@@ -13,7 +13,11 @@ interface FloaterConfig {
   delay: number;
   rotation: number;
   opacity: number;
+  shape: FloaterShape;
 }
+
+type FloaterShape = "triangle" | "cube";
+type FloaterShapeMode = FloaterShape | "both";
 
 @customElement("o-home-floaters")
 export class HomeFloaters extends LitElement {
@@ -32,10 +36,15 @@ export class HomeFloaters extends LitElement {
   @property({ type: Number })
   opacity = 0.45;
 
+  @property({ type: String, reflect: true })
+  shape: FloaterShapeMode = "triangle";
+
   @state()
   private floaters: FloaterConfig[] = [];
 
   private prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  private clickCount = 0;
+  private lastClickAt = 0;
 
   constructor() {
     super();
@@ -115,6 +124,12 @@ export class HomeFloaters extends LitElement {
   public connectedCallback(): void {
     super.connectedCallback();
     this.generateFloaters();
+    window.addEventListener("click", this.handleEasterEggClick, { capture: true });
+  }
+
+  public disconnectedCallback(): void {
+    window.removeEventListener("click", this.handleEasterEggClick, { capture: true });
+    super.disconnectedCallback();
   }
 
   protected willUpdate(changedProperties: Map<string, unknown>): void {
@@ -123,13 +138,50 @@ export class HomeFloaters extends LitElement {
       changedProperties.has("minSize") ||
       changedProperties.has("maxSize") ||
       changedProperties.has("speed") ||
-      changedProperties.has("opacity")
+      changedProperties.has("opacity") ||
+      changedProperties.has("shape")
     ) {
       this.generateFloaters();
     }
   }
 
+  private handleEasterEggClick = (): void => {
+    const now = performance.now();
+    if (now - this.lastClickAt > 500) {
+      this.clickCount = 0;
+    }
+    this.lastClickAt = now;
+    this.clickCount += 1;
+    if (this.clickCount >= 3) {
+      this.clickCount = 0;
+      this.cycleShapeMode();
+    }
+  };
+
+  private cycleShapeMode(): void {
+    const modes: FloaterShapeMode[] = ["triangle", "cube", "both"];
+    const current = this.normalizeShapeMode(this.shape);
+    const currentIndex = modes.indexOf(current);
+    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % modes.length;
+    this.shape = modes[nextIndex];
+  }
+
+  private normalizeShapeMode(mode: string): FloaterShapeMode {
+    if (mode === "triangle" || mode === "cube" || mode === "both") {
+      return mode;
+    }
+    return "triangle";
+  }
+
+  private resolveShape(mode: FloaterShapeMode): FloaterShape {
+    if (mode === "both") {
+      return Math.random() > 0.5 ? "triangle" : "cube";
+    }
+    return mode;
+  }
+
   private generateFloaters(): void {
+    const shapeMode = this.normalizeShapeMode(this.shape);
     const speed = this.speed > 0 ? this.speed : 1;
     const count = Math.max(0, Math.floor(this.count));
     const minSize = Math.min(this.minSize, this.maxSize);
@@ -157,7 +209,8 @@ export class HomeFloaters extends LitElement {
         spinDuration,
         delay,
         rotation,
-        opacity
+        opacity,
+        shape: this.resolveShape(shapeMode)
       };
     });
   }
@@ -184,6 +237,22 @@ export class HomeFloaters extends LitElement {
     `;
   }
 
+  private renderCube() {
+    return html`
+      <svg viewBox="0 0 279.8076211353316 320" role="presentation" aria-hidden="true">
+        <path
+          d="M 139.90 310.00 L 269.81 235.00 L 165.88 175.00 L 165.88 205.00 L 217.85 235.00 L 139.90 280.00 L 61.96 235.00 L 113.92 205.00 L 113.92 175.00 L 10.00 235.00 L 139.90 310.00 M 139.90 280.00 L 217.85 235.00 L 191.87 220.00 L 165.88 235.00 L 165.88 175.00 L 217.85 145.00 L 217.85 175.00 L 243.83 190.00 L 243.83 100.00 L 139.90 160.00 L 139.90 280.00 M 139.90 280.00 L 61.96 235.00 L 87.94 220.00 L 113.92 235.00 L 113.92 175.00 L 61.96 145.00 L 61.96 175.00 L 35.98 190.00 L 35.98 100.00 L 139.90 160.00 L 139.90 280.00 M 139.90 160.00 L 243.83 100.00 L 165.88 55.00 L 165.88 85.00 L 191.87 100.00 L 139.90 130.00 L 87.94 100.00 L 113.92 85.00 L 113.92 55.00 L 35.98 100.00 M 113.92 175.00 L 10.00 235.00 L 10.00 85.00 L 139.90 10.00 L 139.90 130.00 L 113.92 115.00 L 113.92 55.00 L 35.98 100.00 L 35.98 190.00 L 87.94 160.00 M 165.88 175.00 L 269.81 235.00 L 269.81 85.00 L 139.90 10.00 L 139.90 130.00 L 165.88 115.00 L 165.88 55.00 L 243.83 100.00 L 243.83 190.00 L 191.87 160.00"
+          stroke-width="1"
+          fill="none"
+        ></path>
+      </svg>
+    `;
+  }
+
+  private renderShape(shape: FloaterShape) {
+    return shape === "cube" ? this.renderCube() : this.renderPenrose();
+  }
+
   render() {
     return html`
       ${this.floaters.map((floater) => {
@@ -200,7 +269,7 @@ export class HomeFloaters extends LitElement {
           "--opacity": `${floater.opacity}`
         };
 
-        return html`<div class="floater" style=${styleMap(styles)}>${this.renderPenrose()}</div>`;
+        return html`<div class="floater" style=${styleMap(styles)}>${this.renderShape(floater.shape)}</div>`;
       })}
     `;
   }
