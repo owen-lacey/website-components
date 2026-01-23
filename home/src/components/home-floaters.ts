@@ -188,7 +188,6 @@ export class HomeFloaters extends LitElement {
   }
 
   private generateFloaters(): void {
-    const shapeMode = this.normalizeShapeMode(this.shape);
     const speed = this.speed > 0 ? this.speed : 1;
     const count = Math.max(0, Math.floor(this.count));
     const minSize = Math.min(this.minSize, this.maxSize);
