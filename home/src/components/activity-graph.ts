@@ -109,6 +109,13 @@ export class ActivityGraph extends LitElement {
       { threshold: 0.3 }
     );
     this.observer.observe(this);
+
+    // Check if already visible on load
+    const rect = this.getBoundingClientRect();
+    const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+    if (isVisible && !this.hasAnimated && this.data) {
+      this.startAnimation();
+    }
   }
 
   private async fetchData() {
@@ -130,6 +137,15 @@ export class ActivityGraph extends LitElement {
       // Draw after update
       await this.updateComplete;
       this.draw();
+
+      // Check if visible and should animate (data just loaded)
+      if (this.animated && !this.hasAnimated) {
+        const rect = this.getBoundingClientRect();
+        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+        if (isVisible) {
+          this.startAnimation();
+        }
+      }
     } catch (err) {
       this.error = err instanceof Error ? err.message : 'Failed to load data';
     }
@@ -378,7 +394,7 @@ export class ActivityGraph extends LitElement {
     // Draw baseline at y=1.0 (average line)
     const baselineY = topPad + h - ((1 - min) / finalRange) * h;
     ctx.save();
-    ctx.strokeStyle = '#444';
+    ctx.strokeStyle = 'rgb(155, 156, 157)';
     ctx.lineWidth = 1;
     ctx.setLineDash([5, 5]);
     ctx.beginPath();
@@ -386,13 +402,6 @@ export class ActivityGraph extends LitElement {
     ctx.lineTo(pad + w, baselineY);
     ctx.stroke();
     ctx.setLineDash([]);
-
-    // Label the baseline
-    ctx.fillStyle = '#666';
-    ctx.font = '10px monospace';
-    ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('avg', pad - 5, baselineY);
     ctx.restore();
 
     // Clear positions for hit testing
