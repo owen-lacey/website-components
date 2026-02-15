@@ -313,9 +313,12 @@ export class ActivityGraph extends LitElement {
 
     const normalized = new Map<string, NormalizedActivity>();
 
+    // Reverse so oldest date is first (left) and newest is last (right)
+    const dailyChronological = [...this.data.daily].reverse();
+
     for (const activity of ACTIVITIES) {
       const average = this.data.averages[activity.key];
-      const rawValues = this.data.daily.map(day => day[activity.key] as number);
+      const rawValues = dailyChronological.map(day => day[activity.key] as number);
       const totalLength = rawValues.length;
 
       // Find the first non-zero data point so lines start where real data begins
@@ -326,8 +329,11 @@ export class ActivityGraph extends LitElement {
       const slicedValues = rawValues.slice(startIndex);
       const normalizedValues = slicedValues.map(v => average > 0 ? v / average : 0);
 
+      // Cap extreme outliers to prevent them from dominating the Y-axis scale
+      const cappedValues = normalizedValues.map(v => Math.min(v, 4));
+
       // Apply 7-day moving average for smoother lines
-      const smoothedValues = this.movingAverage(normalizedValues, 7);
+      const smoothedValues = this.movingAverage(cappedValues, 7);
       normalized.set(activity.key, { values: smoothedValues, startIndex, totalLength });
     }
 
