@@ -332,8 +332,9 @@ export class ActivityGraph extends LitElement {
       // Cap extreme outliers to prevent them from dominating the Y-axis scale
       const cappedValues = normalizedValues.map(v => Math.min(v, 4));
 
-      // Apply 7-day moving average for smoother lines
-      const smoothedValues = this.movingAverage(cappedValues, 7);
+      // Apply moving average multiple passes for smoother trend lines
+      const pass1 = this.movingAverage(cappedValues, 21);
+      const smoothedValues = this.movingAverage(pass1, 14);
       normalized.set(activity.key, { values: smoothedValues, startIndex, totalLength });
     }
 
