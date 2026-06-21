@@ -26,6 +26,12 @@ interface ActivityConfig {
   iconPath: string;
 }
 
+interface NormalizedActivity {
+  values: number[];
+  startIndex: number;
+  totalLength: number;
+}
+
 // SVG paths for brand icons
 const SPOTIFY_ICON = "M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z";
 const STRAVA_ICON = "M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169";
@@ -302,25 +308,34 @@ export class ActivityGraph extends LitElement {
     return html`<canvas></canvas>`;
   }
 
-  private getNormalizedData(): Map<string, number[]> {
+  private getNormalizedData(): Map<string, NormalizedActivity> {
     if (!this.data) return new Map();
 
-    const normalized = new Map<string, number[]>();
+    const normalized = new Map<string, NormalizedActivity>();
+
+    // Reverse so oldest date is first (left) and newest is last (right)
+    const dailyChronological = [...this.data.daily].reverse();
 
     for (const activity of ACTIVITIES) {
       const average = this.data.averages[activity.key];
-      const rawValues = this.data.daily.map(day => {
-        const value = day[activity.key];
-        // Normalize: value / average, so 1.0 = average
-        return average > 0 ? value / average : 0;
-      });
+      const rawValues = dailyChronological.map(day => day[activity.key] as number);
+      const totalLength = rawValues.length;
 
-      // Three passes approximates a Gaussian kernel, eliminating the flat plateaus
-      // a single box average produces on near-binary data (e.g. run/rest days).
-      let smoothedValues = this.movingAverage(rawValues, 7);
-      smoothedValues = this.movingAverage(smoothedValues, 7);
-      smoothedValues = this.movingAverage(smoothedValues, 7);
-      normalized.set(activity.key, smoothedValues);
+      // Find the first non-zero data point so lines start where real data begins
+      const startIndex = rawValues.findIndex(v => v > 0);
+      if (startIndex === -1) continue; // no data at all for this activity
+
+      // Slice from first non-zero value to avoid flat lines from missing data
+      const slicedValues = rawValues.slice(startIndex);
+      const normalizedValues = slicedValues.map(v => average > 0 ? v / average : 0);
+
+      // Cap extreme outliers to prevent them from dominating the Y-axis scale
+      const cappedValues = normalizedValues.map(v => Math.min(v, 4));
+
+      // Apply moving average multiple passes for smoother trend lines
+      const pass1 = this.movingAverage(cappedValues, 21);
+      const smoothedValues = this.movingAverage(pass1, 14);
+      normalized.set(activity.key, { values: smoothedValues, startIndex, totalLength });
     }
 
     return normalized;
@@ -381,8 +396,8 @@ export class ActivityGraph extends LitElement {
     // Find min/max across all normalized data for consistent scaling
     let min = Infinity;
     let max = -Infinity;
-    for (const values of normalizedData.values()) {
-      for (const v of values) {
+    for (const activity of normalizedData.values()) {
+      for (const v of activity.values) {
         if (v < min) min = v;
         if (v > max) max = v;
       }
@@ -425,11 +440,12 @@ export class ActivityGraph extends LitElement {
 
     // Draw each activity line
     ACTIVITIES.forEach((activity, activityIndex) => {
-      const values = normalizedData.get(activity.key);
-      if (!values || values.length === 0) return;
+      const activityData = normalizedData.get(activity.key);
+      if (!activityData || activityData.values.length === 0) return;
 
+      const { values, startIndex, totalLength } = activityData;
       const points = values.map((v, i) => ({
-        x: pad + (i / (values.length - 1)) * w,
+        x: pad + ((startIndex + i) / (totalLength - 1)) * w,
         y: topPad + h - ((v - min) / finalRange) * h
       }));
 
