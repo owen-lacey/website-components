@@ -332,36 +332,32 @@ export class ActivityGraph extends LitElement {
       // Cap extreme outliers to prevent them from dominating the Y-axis scale
       const cappedValues = normalizedValues.map(v => Math.min(v, 4));
 
-      // Apply moving average multiple passes for smoother trend lines
-      const pass1 = this.movingAverage(cappedValues, 21);
-      const smoothedValues = this.movingAverage(pass1, 14);
+      const smoothedValues = this.gaussianSmooth(cappedValues, 7);
       normalized.set(activity.key, { values: smoothedValues, startIndex, totalLength });
     }
 
     return normalized;
   }
 
-  private movingAverage(values: number[], windowSize: number): number[] {
-    const result: number[] = [];
-
-    for (let i = 0; i < values.length; i++) {
-      // Calculate the window bounds (centered, but clamped at edges)
-      const halfWindow = Math.floor(windowSize / 2);
-      const start = Math.max(0, i - halfWindow);
-      const end = Math.min(values.length - 1, i + halfWindow);
-
-      // Calculate the average of the window
-      let sum = 0;
-      let count = 0;
-      for (let j = start; j <= end; j++) {
-        sum += values[j];
-        count++;
-      }
-
-      result.push(sum / count);
+  private gaussianSmooth(values: number[], sigma: number): number[] {
+    const radius = Math.ceil(sigma * 3);
+    const weights: number[] = [];
+    for (let i = -radius; i <= radius; i++) {
+      weights.push(Math.exp(-(i * i) / (2 * sigma * sigma)));
     }
 
-    return result;
+    return values.map((_, i) => {
+      let sum = 0;
+      let weightSum = 0;
+      for (let j = -radius; j <= radius; j++) {
+        const idx = i + j;
+        if (idx >= 0 && idx < values.length) {
+          sum += values[idx] * weights[j + radius];
+          weightSum += weights[j + radius];
+        }
+      }
+      return sum / weightSum;
+    });
   }
 
   private draw() {
