@@ -315,8 +315,11 @@ export class ActivityGraph extends LitElement {
         return average > 0 ? value / average : 0;
       });
 
-      // Apply 7-day moving average for smoother lines
-      const smoothedValues = this.movingAverage(rawValues, 7);
+      // Three passes approximates a Gaussian kernel, eliminating the flat plateaus
+      // a single box average produces on near-binary data (e.g. run/rest days).
+      let smoothedValues = this.movingAverage(rawValues, 7);
+      smoothedValues = this.movingAverage(smoothedValues, 7);
+      smoothedValues = this.movingAverage(smoothedValues, 7);
       normalized.set(activity.key, smoothedValues);
     }
 

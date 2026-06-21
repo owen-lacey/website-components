@@ -17,7 +17,7 @@ const meta: Meta = {
     }
   },
   args: {
-    endpoint: "http://localhost:57605/wubu2",
+    endpoint: "http://localhost:8787/wubu2",
     animated: true
   },
   render: (args) => html`
